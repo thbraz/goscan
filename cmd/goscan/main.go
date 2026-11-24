@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/thbraz/goscan/internal/cli"
+	"github.com/thbraz/goscan/internal/scanner"
 )
 
 func main() {
@@ -15,7 +16,14 @@ func main() {
 		os.Exit(exitCodeFor(err))
 	}
 
-	fmt.Printf("Scanning: %s\n", args.Host)
+	results := scanner.Scan(args)
+
+	for _, v := range results {
+		if v.Open {
+			fmt.Printf("%+v \n", v)
+		}
+	}
+
 }
 
 func exitCodeFor(err error) int {
