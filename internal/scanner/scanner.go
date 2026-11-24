@@ -9,6 +9,7 @@ import (
 
 const (
 	dialNetworkTCP = "tcp"
+	maxPort = 65536
 )
 
 type DialResult struct {
@@ -17,9 +18,9 @@ type DialResult struct {
 }
 
 func Scan(args cli.Args) []DialResult {
-	var results []DialResult
+	results := make([]DialResult, 0, maxPort)
 
-	for port := range 65536 {
+	for port := 1; port <= maxPort; port++ {
 		results = append(results, conn(args.Host, port))
 	}
 
