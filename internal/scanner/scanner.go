@@ -2,7 +2,7 @@ package scanner
 
 import (
 	"net"
-	"fmt"
+	"strconv"
 
 	"github.com/thbraz/goscan/internal/cli"
 )
@@ -27,7 +27,7 @@ func Scan(args cli.Args) []DialResult {
 }
 
 func conn(host string, port int) DialResult {
-	addr := fmt.Sprintf("%s:%d", host, port)
+	addr := net.JoinHostPort(host, strconv.Itoa(port))
 
 	conn, err := net.Dial(dialNetworkTCP, addr)
 	if err != nil {
