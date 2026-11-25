@@ -5,17 +5,30 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
+	"time"
+	
 	"github.com/thbraz/goscan/internal/cli"
+	"github.com/thbraz/goscan/internal/scanner"
 )
 
 func main() {
+	start := time.Now()
 	args, err := cli.ParseArgs(os.Args[1:], os.Stderr)
 	if err != nil {
 		os.Exit(exitCodeFor(err))
 	}
 
-	fmt.Printf("Scanning: %s\n", args.Host)
+	results := scanner.Scan(args)
+
+	for _, v := range results {
+		if v.Open {
+			fmt.Printf("%+v \n", v)
+		}
+	}
+
+	t := time.Now()
+	fmt.Println()
+	fmt.Printf("Time elapsed: %.2f seconds\n", t.Sub(start).Seconds())
 }
 
 func exitCodeFor(err error) int {
