@@ -4,7 +4,6 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/thbraz/goscan/internal/cli"
 )
 
 const (
@@ -17,11 +16,11 @@ type DialResult struct {
 	Open bool
 }
 
-func Scan(args cli.Args) []DialResult {
+func Scan(host string) []DialResult {
 	results := make([]DialResult, 0, maxPort)
 
 	for port := 1; port <= maxPort; port++ {
-		results = append(results, conn(args.Host, port))
+		results = append(results, conn(host, port))
 	}
 
 	return results
@@ -38,4 +37,3 @@ func conn(host string, port int) DialResult {
 
 	return DialResult{Port: port, Open: true}
 }
-
