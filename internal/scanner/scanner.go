@@ -20,13 +20,13 @@ func Scan(host string) []DialResult {
 	results := make([]DialResult, 0, maxPort)
 
 	for port := 1; port <= maxPort; port++ {
-		results = append(results, conn(host, port))
+		results = append(results, probePort(host, port))
 	}
 
 	return results
 }
 
-func conn(host string, port int) DialResult {
+func probePort(host string, port int) DialResult {
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
 
 	conn, err := net.Dial(dialNetworkTCP, addr)
