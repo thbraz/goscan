@@ -4,6 +4,7 @@ import (
 	"net"
 	"strconv"
 
+	"golang.org/x/tools/go/analysis/passes/nilfunc"
 )
 
 const (
@@ -30,10 +31,10 @@ func probePort(host string, port int) DialResult {
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
 
 	conn, err := net.Dial(dialNetworkTCP, addr)
-	if err != nil {
-		return DialResult{Port: port, Open: false}
+	open := err == nil
+	if open {
+		conn.Close()
 	}
-	conn.Close()
 
-	return DialResult{Port: port, Open: true}
+	return DialResult{Port: port, Open: open}
 }
