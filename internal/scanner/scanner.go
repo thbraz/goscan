@@ -3,6 +3,7 @@ package scanner
 import (
 	"net"
 	"strconv"
+	"sync"
 )
 
 const (
@@ -17,11 +18,19 @@ type DialResult struct {
 }
 
 func Scan(host string) []DialResult {
-	results := make([]DialResult, 0, maxPort)
+	results := make([]DialResult, maxPort)
+	sem := make(chan struct{}, 500)
 
+	var wg sync.WaitGroup
 	for port := minPort; port <= maxPort; port++ {
-		results = append(results, probePort(host, port))
+		sem <- struct{}{}
+		
+		wg.Go(func() {
+			defer func() { <-sem }()
+			results[port-1] = probePort(host, port)
+		})
 	}
+	wg.Wait()
 
 	return results
 }

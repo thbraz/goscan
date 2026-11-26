@@ -23,7 +23,6 @@ func main() {
 			fmt.Printf("%+v \n", v)
 		}
 	}
-
 }
 
 func exitCodeFor(err error) int {
