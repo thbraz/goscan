@@ -3,13 +3,13 @@ package scanner
 import (
 	"net"
 	"strconv"
-
-	"github.com/thbraz/goscan/internal/cli"
+	"sync"
 )
 
 const (
 	dialNetworkTCP = "tcp"
 	maxPort = 65536
+	minPort = 1
 )
 
 type DialResult struct {
@@ -17,25 +17,32 @@ type DialResult struct {
 	Open bool
 }
 
-func Scan(args cli.Args) []DialResult {
-	results := make([]DialResult, 0, maxPort)
+func Scan(host string) []DialResult {
+	results := make([]DialResult, maxPort)
+	sem := make(chan struct{}, 500)
 
-	for port := 1; port <= maxPort; port++ {
-		results = append(results, conn(args.Host, port))
+	var wg sync.WaitGroup
+	for port := minPort; port <= maxPort; port++ {
+		sem <- struct{}{}
+		
+		wg.Go(func() {
+			defer func() { <-sem }()
+			results[port-1] = probePort(host, port)
+		})
 	}
+	wg.Wait()
 
 	return results
 }
 
-func conn(host string, port int) DialResult {
+func probePort(host string, port int) DialResult {
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
 
 	conn, err := net.Dial(dialNetworkTCP, addr)
-	if err != nil {
-		return DialResult{Port: port, Open: false}
+	open := err == nil
+	if open {
+		conn.Close()
 	}
-	conn.Close()
 
-	return DialResult{Port: port, Open: true}
+	return DialResult{Port: port, Open: open}
 }
-

@@ -18,7 +18,7 @@ func main() {
 		os.Exit(exitCodeFor(err))
 	}
 
-	results := scanner.Scan(args)
+	results := scanner.Scan(args.Host)
 
 	for _, v := range results {
 		if v.Open {
